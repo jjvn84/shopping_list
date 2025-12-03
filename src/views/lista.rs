@@ -1,4 +1,5 @@
 use crate::DATABASE;
+use crate::components::Toggle;
 use crate::model::{Item, ItemForm, Lista};
 use dioxus::prelude::*;
 use dioxus_i18n::tid;
@@ -23,11 +24,10 @@ pub fn ListaView(id: usize) -> Element {
     rsx! {
         div { class: "sticky top-14 text-white bg-blue-600 flex justify-between p-1 text-xl mb-2 items-center",
             h1 { class: "flex-none", "{lista().nombre}" }
-            input {
-                r#type: "checkbox",
-                role: "switch",
-                class: "input flex-none",
+            Toggle {
+                text_size_class: "text-sm",
                 checked: modo_simple(),
+                value: String::default(),
                 onchange: move |_| {
                     let new_value = !modo_simple();
                     let modo_simple_int = if new_value { 1 } else { 0 };
