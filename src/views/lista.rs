@@ -43,14 +43,14 @@ pub fn ListaView(id: usize) -> Element {
         div { class: "px-2 mb-2 columns-1 md:columns-2 lg:columns-3 xl:columns-4 2xl:columns-5",
             for item in lista().items.unwrap() {
                 if modo_simple() {
-                    ItemCardSimple { item }
+                    ItemCardSimple { key: "{item.id}", item }
                 } else {
-                    ItemCard { item }
+                    ItemCard { key: "{item.id}", item }
                 }
             }
         }
         button {
-            class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+            class: "text-white bg-blue-700 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center",
             onclick: move |_| {
                 let mut items = lista().items.unwrap();
                 items.push(Item::default());
@@ -59,7 +59,7 @@ pub fn ListaView(id: usize) -> Element {
             MaterialIcon { name: "add_shopping_cart", size: 24 }
         }
         button {
-            class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+            class: "text-white bg-blue-700 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center",
             onclick: move |_| {
                 _ = DATABASE.with(|f| f.clear_list_items(lista().id));
                 lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
@@ -91,81 +91,74 @@ fn ItemCard(item: Item) -> Element {
     }
 
     rsx! {
-        div {
-            key: "{item.id}",
+        form {
             class: "{bg_card_color} rounded-lg p-2 break-inside-avoid-column mb-2",
-            form {
-                onchange: {
-                    move |event: Event<FormData>| {
-                        handle_change(event);
+            onchange: {
+                move |event: Event<FormData>| {
+                    handle_change(event);
+                    lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
+                }
+            },
+            input { r#type: "hidden", name: "id", value: "{item.id}" }
+            input { r#type: "hidden", name: "id_lista", value: "{lista().id}" }
+            div { class: "flex text-md justify-between",
+                div { class: "flex",
+                    input {
+                        r#type: "number",
+                        class: "w-[5ch]",
+                        name: "cantidad_requerida",
+                        value: "{item.cantidad_requerida:.3}",
+                    }
+                    select { class: "w-[8ch]", name: "unidad",
+                        option {
+                            value: "unidad",
+                            selected: item.unidad == "unidad",
+                            {tid!("unidad")}
+                        }
+                        option { value: "kg", selected: item.unidad == "kg", {tid!("kg")} }
+                        option {
+                            value: "docena",
+                            selected: item.unidad == "docena",
+                            {tid!("docena")}
+                        }
+                    }
+                }
+                div { class: "flex",
+                    input {
+                        r#type: "number",
+                        class: "w-[4ch]",
+                        name: "precio",
+                        value: "{item.precio:.2}",
+                    }
+                    {format!(" {} {}", tid!("per"), tid!(& item.unidad))}
+                }
+                button {
+                    r#type: "button",
+                    class: "text-red-600 rounded-full px-5 text-center",
+                    onclick: move |_| {
+                        let _ = DATABASE.with(|f| f.delete_item(item.id));
                         lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
-                    }
-                },
-                input { r#type: "hidden", name: "id", value: "{item.id}" }
-                input {
-                    r#type: "hidden",
-                    name: "id_lista",
-                    value: "{lista().id}",
+                    },
+                    MaterialIcon { name: "delete" }
                 }
-                div { class: "flex text-md justify-between",
-                    div { class: "flex",
-                        input {
-                            r#type: "number",
-                            class: "w-[5ch]",
-                            name: "cantidad_requerida",
-                            value: "{item.cantidad_requerida:.3}",
-                        }
-                        select { class: "w-[8ch]", name: "unidad",
-                            option {
-                                value: "unidad",
-                                selected: item.unidad == "unidad",
-                                {tid!("unidad")}
-                            }
-                            option { value: "kg", selected: item.unidad == "kg", {tid!("kg")} }
-                            option {
-                                value: "docena",
-                                selected: item.unidad == "docena",
-                                {tid!("docena")}
-                            }
-                        }
-                    }
-                    div { class: "flex",
-                        input {
-                            r#type: "number",
-                            class: "w-[4ch]",
-                            name: "precio",
-                            value: "{item.precio:.2}",
-                        }
-                        {format!(" {} {}", tid!("per"), tid!(& item.unidad))}
-                    }
-                    button {
-                        r#type: "button",
-                        class: "text-red-600 focus:outline-none rounded-full px-5 text-center",
-                        onclick: move |_| {
-                            let _ = DATABASE.with(|f| f.delete_item(item.id));
-                            lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
-                        },
-                        MaterialIcon { name: "delete" }
+            }
+            div { class: "flex text-lg font-bold justify-between",
+                div {
+                    input {
+                        r#type: "text",
+                        class: "w-42",
+                        name: "nombre",
+                        value: item.nombre,
                     }
                 }
-                div { class: "flex text-lg font-bold justify-between",
-                    div {
-                        input {
-                            r#type: "text",
-                            class: "w-42",
-                            name: "nombre",
-                            value: item.nombre,
-                        }
+                div {
+                    input {
+                        r#type: "number",
+                        class: "w-[5ch]",
+                        name: "cantidad_comprada",
+                        value: "{item.cantidad_comprada:.3}",
                     }
-                    div {
-                        input {
-                            r#type: "number",
-                            class: "w-[5ch]",
-                            name: "cantidad_comprada",
-                            value: "{item.cantidad_comprada:.3}",
-                        }
-                        {format!("{} {:.2}", tid!("total"), precio_total)}
-                    }
+                    {format!("{} {:.2}", tid!("total"), precio_total)}
                 }
             }
         }
@@ -192,67 +185,45 @@ fn ItemCardSimple(item: Item) -> Element {
     }
 
     rsx! {
-        div {
-            key: "{item.id}",
-            class: "{bg_card_color} rounded-lg p-2 break-inside-avoid-column mb-2",
-            form {
-                key: "{item.id}_form",
-                onchange: {
-                    move |event: Event<FormData>| {
-                        handle_change(event);
-                        lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
-                    }
+        form {
+            class: "{bg_card_color} rounded-lg p-2 break-inside-avoid-column mb-2 flex text-lg font-bold justify-between",
+            onchange: {
+                move |event: Event<FormData>| {
+                    handle_change(event);
+                    lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
+                }
+            },
+            input { r#type: "hidden", name: "id", value: "{item.id}" }
+            input { r#type: "hidden", name: "id_lista", value: "{lista().id}" }
+            input { r#type: "hidden", name: "unidad", value: "{item.unidad}" }
+            input {
+                r#type: "hidden",
+                name: "cantidad_requerida",
+                value: "{item.cantidad_requerida}",
+            }
+            input { r#type: "hidden", name: "precio", value: "{item.precio}" }
+            input {
+                r#type: "text",
+                class: "w-42",
+                name: "nombre",
+                value: item.nombre,
+            }
+            input {
+                r#type: "checkbox",
+                role: "switch",
+                class: "input",
+                value: "1.000",
+                name: "cantidad_comprada",
+                checked: item.cantidad_comprada >= 0.001,
+            }
+            button {
+                r#type: "button",
+                class: "text-red-600 rounded-full px-5 text-center",
+                onclick: move |_| {
+                    let _ = DATABASE.with(|f| f.delete_item(item.id));
+                    lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
                 },
-                input { r#type: "hidden", name: "id", value: "{item.id}" }
-                input {
-                    r#type: "hidden",
-                    name: "id_lista",
-                    value: "{lista().id}",
-                }
-                input {
-                    r#type: "hidden",
-                    name: "unidad",
-                    value: "{item.unidad}",
-                }
-                input {
-                    r#type: "hidden",
-                    name: "cantidad_requerida",
-                    value: "{item.cantidad_requerida}",
-                }
-                input {
-                    r#type: "hidden",
-                    name: "precio",
-                    value: "{item.precio}",
-                }
-                div {
-                    key: "{item.id}_item_line",
-                    class: "flex text-lg font-bold justify-between",
-                    input {
-                        key: "{item.id}_item_nombre",
-                        r#type: "text",
-                        class: "w-42",
-                        name: "nombre",
-                        value: item.nombre,
-                    }
-                    input {
-                        key: "{item.id}_item_cantidad_comprada",
-                        r#type: "checkbox",
-                        role: "switch",
-                        class: "input",
-                        value: "1.000",
-                        name: "cantidad_comprada",
-                        checked: item.cantidad_comprada >= 0.001,
-                    }
-                    button {
-                        r#type: "button",
-                        class: "text-red-600 focus:outline-none rounded-full px-5 text-center",
-                        onclick: move |_| {
-                            let _ = DATABASE.with(|f| f.delete_item(item.id));
-                            lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
-                        },
-                        MaterialIcon { name: "delete" }
-                    }
-                }
+                MaterialIcon { name: "delete" }
             }
         }
     }

@@ -25,7 +25,7 @@ Esta es una app para llevar el control de listas de compras de productos
 - ¿Modal para agregar y editar items en vez de hacerlo en la misma lista?
 - Evitar que el ícono del link al home se mueva cuando entras a la vista de una lista.
 ## Bugs
-- En modo simple se activan toggles incorrectamente al reordenar la lista.
+
 
 # ERD
 
