@@ -7,7 +7,7 @@ edition = "2024"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dioxus = { version = "0.7.1", features = ["router", "mobile", "html"] }
+dioxus = { version = "0.7.2", features = ["router", "mobile", "html"] }
 dioxus-material-icons = { version = "4.0.1" }
 rusqlite = { version = "0.37.0", features = ["bundled", "serialize"] }
 jni = "0.21"
