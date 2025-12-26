@@ -24,6 +24,7 @@ Esta es una app para llevar el control de listas de compras de productos
 - Botón para marcar un item como "no hay, queda para la siguiente visita a la tienda"
 - ¿Modal para agregar y editar items en vez de hacerlo en la misma lista?
 - Evitar que el ícono del link al home se mueva cuando entras a la vista de una lista.
+- Mostrar mensajes de error al usuario cuando alguna operación con la base de datos falle.
 ## Bugs
 
 
