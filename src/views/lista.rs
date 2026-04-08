@@ -14,7 +14,7 @@ struct ListaViewState {
 }
 
 #[component]
-pub fn ListaView(id: usize) -> Element {
+pub fn ListaView(id: u32) -> Element {
     use_context_provider(|| ListaViewState {
         lista: Signal::new(DATABASE.with(|f| f.get_list(id).unwrap())),
     });

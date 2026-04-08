@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Lista {
-    pub id: usize,
+    pub id: u32,
     pub nombre: String,
     pub items: Option<Vec<Item>>,
     pub total: f32,
@@ -11,8 +11,8 @@ pub struct Lista {
 
 #[derive(PartialEq, Clone, Debug, Deserialize)]
 pub struct Item {
-    pub id: usize,
-    pub id_lista: usize,
+    pub id: u32,
+    pub id_lista: u32,
     pub nombre: String,
     pub unidad: String,
     pub cantidad_requerida: f32,

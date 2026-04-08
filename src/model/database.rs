@@ -9,18 +9,18 @@ pub trait DBConnector {
     fn create_new_list(&self, nombre: String) -> Result<(), anyhow::Error>;
     fn update_list(
         &self,
-        id: usize,
+        id: u32,
         nombre: String,
-        modo_simple: usize,
+        modo_simple: u32,
     ) -> Result<(), rusqlite::Error>;
     fn get_list_of_lists(&self) -> Result<Vec<Lista>, anyhow::Error>;
-    fn get_list(&self, id_lista: usize) -> Result<Lista, anyhow::Error>;
-    fn delete_list(&self, id_lista: usize) -> Result<(), anyhow::Error>;
+    fn get_list(&self, id_lista: u32) -> Result<Lista, anyhow::Error>;
+    fn delete_list(&self, id_lista: u32) -> Result<(), anyhow::Error>;
     // Operaciones con items
-    fn create_new_list_item(&self, id_lista: usize, item: Item) -> Result<(), anyhow::Error>;
+    fn create_new_list_item(&self, id_lista: u32, item: Item) -> Result<(), anyhow::Error>;
     fn update_list_item(&self, item: Item) -> Result<(), anyhow::Error>;
-    fn delete_item(&self, id: usize) -> Result<(), anyhow::Error>;
-    fn clear_list_items(&self, id_lista: usize) -> Result<(), anyhow::Error>;
+    fn delete_item(&self, id: u32) -> Result<(), anyhow::Error>;
+    fn clear_list_items(&self, id_lista: u32) -> Result<(), anyhow::Error>;
 }
 
 pub struct SQLiteConnector {
@@ -112,9 +112,9 @@ impl DBConnector for SQLiteConnector {
 
     fn update_list(
         &self,
-        id: usize,
+        id: u32,
         nombre: String,
-        modo_simple: usize,
+        modo_simple: u32,
     ) -> Result<(), rusqlite::Error> {
         if !nombre.trim().is_empty() {
             self.connection.execute(
@@ -132,7 +132,7 @@ impl DBConnector for SQLiteConnector {
             .prepare("SELECT id, nombre, modo_simple FROM listas ORDER BY nombre;")
             .unwrap()
             .query_map([], |row| {
-                Ok((row.get(0)?, row.get(1)?, row.get::<usize, usize>(2)?))
+                Ok((row.get(0)?, row.get(1)?, row.get::<usize, u32>(2)?))
             })
             .unwrap()
             .map(|r| {
@@ -149,13 +149,13 @@ impl DBConnector for SQLiteConnector {
         Ok(result)
     }
 
-    fn get_list(&self, id_lista: usize) -> Result<Lista, anyhow::Error> {
+    fn get_list(&self, id_lista: u32) -> Result<Lista, anyhow::Error> {
         let result = self
             .connection
             .prepare("SELECT id, nombre, modo_simple FROM listas WHERE id = (?1);")
             .unwrap()
             .query_row([id_lista], |row| {
-                Ok((row.get(0)?, row.get(1)?, row.get::<usize, usize>(2)?))
+                Ok((row.get(0)?, row.get(1)?, row.get::<usize, u32>(2)?))
             })
             .unwrap();
         let mut final_list = Lista {
@@ -205,7 +205,7 @@ impl DBConnector for SQLiteConnector {
         Ok(final_list)
     }
 
-    fn delete_list(&self, id_lista: usize) -> Result<(), anyhow::Error> {
+    fn delete_list(&self, id_lista: u32) -> Result<(), anyhow::Error> {
         self.connection
             .execute("DELETE FROM items WHERE id_lista = ?1;", [id_lista])?;
         self.connection
@@ -214,7 +214,7 @@ impl DBConnector for SQLiteConnector {
     }
 
     // Operaciones con items
-    fn create_new_list_item(&self, id_lista: usize, item: Item) -> Result<(), anyhow::Error> {
+    fn create_new_list_item(&self, id_lista: u32, item: Item) -> Result<(), anyhow::Error> {
         if !item.nombre.trim().is_empty() {
             self.connection.execute("INSERT INTO items (id_lista, nombre, unidad, cantidad_requerida, cantidad_comprada, precio) VALUES (?1, ?2, ?3, ?4, ?5, ?6);", params![id_lista, item.nombre, item.unidad, item.cantidad_requerida, item.cantidad_comprada, item.precio])?;
         }
@@ -228,13 +228,13 @@ impl DBConnector for SQLiteConnector {
         Ok(())
     }
 
-    fn delete_item(&self, id: usize) -> Result<(), anyhow::Error> {
+    fn delete_item(&self, id: u32) -> Result<(), anyhow::Error> {
         self.connection
             .execute("DELETE FROM items WHERE id = ?1;", [id])?;
         Ok(())
     }
 
-    fn clear_list_items(&self, id_lista: usize) -> Result<(), anyhow::Error> {
+    fn clear_list_items(&self, id_lista: u32) -> Result<(), anyhow::Error> {
         self.connection.execute(
             "UPDATE items SET cantidad_comprada=?1 WHERE id_lista = ?2",
             params![0.0, id_lista],

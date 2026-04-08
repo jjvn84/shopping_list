@@ -14,7 +14,7 @@ enum Route {
     #[route("/")]
     Home {},
     #[route("/lista/:id")]
-    ListaView { id: usize },
+    ListaView { id: u32 },
 }
 
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
