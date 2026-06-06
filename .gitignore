@@ -7,5 +7,6 @@
 **/*.rs.bk
 
 .vscode
+.direnv
 node_modules
 assets/shopping_list.db
