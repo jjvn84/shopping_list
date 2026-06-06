@@ -46,6 +46,7 @@
         targets = [
           "x86_64-unknown-linux-gnu"
           "x86_64-linux-android"
+          "aarch64-linux-android"
         ];
       };
 
@@ -53,7 +54,10 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = [
+          # Rust compiler and tools
           rustToolchain
+
+          # System dependencies for Rust development and Android development
           pkgs.pkg-config
           pkgs.cairo
           pkgs.glib
@@ -67,7 +71,7 @@
           androidEnv.androidsdk
           pkgs.jdk17
           pkgs.gradle
-
+          pkgs.bundletool
         ];
 
         OPENSSL_DIR = "${pkgs.openssl.dev}";
