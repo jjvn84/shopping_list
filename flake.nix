@@ -85,8 +85,6 @@
         ANDROID_NDK_ROOT = "${androidEnv.androidsdk}/libexec/android-sdk/ndk/27.3.13750724";
         ANDROID_NDK_HOME = "${androidEnv.androidsdk}/libexec/android-sdk/ndk/27.3.13750724";
         JAVA_HOME = "${pkgs.jdk17.home}";
-
-        CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER = "${androidEnv.androidsdk}/libexec/android-sdk/ndk/27.3.13750724/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android27-clang";
       };
     };
 }
