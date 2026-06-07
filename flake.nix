@@ -72,6 +72,9 @@
           pkgs.jdk17
           pkgs.gradle
           pkgs.bundletool
+
+          # Tailwind CSS for styling
+          pkgs.tailwindcss_4
         ];
 
         OPENSSL_DIR = "${pkgs.openssl.dev}";
