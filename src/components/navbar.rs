@@ -9,7 +9,7 @@ pub fn Navbar() -> Element {
         MaterialIconStylesheet {}
         div {
             id: "navbar",
-            class: "sticky top-0 flex text-white bg-blue-600 text-2xl p-3 justify-between items-center",
+            class: "sticky top-0 flex text-white bg-slate-900 text-2xl p-3 justify-between items-center shadow-md transition-all",
             MaterialIcon { name: "shopping_cart" }
             "Shopping Lists"
             if current_route.to_string() == "/" {

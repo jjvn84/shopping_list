@@ -22,13 +22,13 @@ pub fn Home() -> Element {
                     div { class: "flex gap-x-2 px-2 col-span-1",
                         input {
                             r#type: "text",
-                            class: "bg-gray-50 border border-gray-300 text-md rounded-lg block w-full p-2.5",
+                            class: "bg-white border border-slate-200 text-md rounded-lg block w-full p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all",
                             placeholder: tid!("new_list_name"),
                             value: nombre_nueva_lista,
                             oninput: move |event| nombre_nueva_lista.set(event.value()),
                         }
                         button {
-                            class: "basis-1/6 text-white bg-blue-700 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center",
+                            class: "flex items-center justify-center w-11 h-11 text-white bg-slate-900 hover:bg-slate-700 rounded-lg transition-colors shrink-0",
                             onclick: move |_| {
                                 let nombre = nombre_nueva_lista.read().to_string();
                                 let _ = DATABASE.with(|f| f.create_new_list(nombre));
@@ -46,7 +46,7 @@ pub fn Home() -> Element {
                     for lista in listas.cloned() {
                         div {
                             key: "{lista.id}",
-                            class: "flex flex-row p-3 text-lg rounded-lg items-center mb-2 justify-between bg-gray-300",
+                            class: "flex flex-row p-3 text-lg rounded-lg items-center mb-2 justify-between bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all",
                             if editing_list_id() != lista.id {
                                 Link {
                                     class: "flex-1",
@@ -55,7 +55,7 @@ pub fn Home() -> Element {
                                 }
                                 button {
                                     r#type: "button",
-                                    class: "text-blue-600 rounded-full px-5 text-center",
+                                    class: "text-slate-600 hover:text-indigo-600 rounded-full px-5 text-center transition-colors",
                                     onclick: move |_| {
                                         editing_list_id.set(lista.id);
                                         editing_list_name.set(lista.nombre.clone());
@@ -64,7 +64,7 @@ pub fn Home() -> Element {
                                 }
                                 button {
                                     r#type: "button",
-                                    class: "text-red-600 rounded-full px-5 text-center",
+                                    class: "text-slate-600 hover:text-red-600 rounded-full px-5 text-center transition-colors",
                                     onclick: move |_| {
                                         let _ = DATABASE.with(|f| f.delete_list(lista.id));
                                         listas.set(DATABASE.with(|f| f.get_list_of_lists()).unwrap_or_default());
@@ -80,7 +80,7 @@ pub fn Home() -> Element {
                                 }
                                 button {
                                     r#type: "button",
-                                    class: "text-green-600 rounded-full px-5 text-center",
+                                    class: "text-green-600 hover:text-green-700 rounded-full px-5 text-center transition-colors",
                                     onclick: move |_| {
                                         let modo_simple_int = if lista.modo_simple { 1 } else { 0 };
                                         _ = DATABASE
@@ -92,7 +92,7 @@ pub fn Home() -> Element {
                                 }
                                 button {
                                     r#type: "button",
-                                    class: "text-red-600 rounded-full px-5 text-center",
+                                    class: "text-slate-600 hover:text-red-600 rounded-full px-5 text-center transition-colors",
                                     onclick: move |_| editing_list_id.set(0),
                                     MaterialIcon { name: "clear", size: 24 }
                                 }

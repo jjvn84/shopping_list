@@ -5,8 +5,8 @@ use dioxus::prelude::*;
 use dioxus_i18n::tid;
 use dioxus_material_icons::MaterialIcon;
 
-const CLASE_COLOR_ITEM_COMPRADO: &str = "bg-green-300";
-const CLASE_COLOR_ITEM_NO_COMPRADO: &str = "bg-gray-300";
+const CLASE_COLOR_ITEM_COMPRADO: &str = "bg-green-50 border-l-4 border-green-500";
+const CLASE_COLOR_ITEM_NO_COMPRADO: &str = "bg-white border-l-4 border-slate-300";
 
 #[derive(Clone, Copy)]
 struct ListaViewState {
@@ -22,7 +22,7 @@ pub fn ListaView(id: u32) -> Element {
     let mut modo_simple = use_signal(|| lista().modo_simple);
 
     rsx! {
-        div { class: "sticky top-14 text-white bg-blue-600 flex justify-between p-1 text-xl mb-2 items-center",
+        div { class: "sticky top-14 text-white bg-slate-900 flex justify-between p-1 text-xl mb-2 items-center shadow-md",
             h1 { class: "flex-none", "{lista().nombre}" }
             Toggle {
                 text_size_class: "text-sm",
@@ -50,7 +50,7 @@ pub fn ListaView(id: u32) -> Element {
             }
         }
         button {
-            class: "text-white bg-blue-700 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center",
+            class: "text-white bg-slate-800 hover:bg-slate-700 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center transition-colors",
             onclick: move |_| {
                 let mut items = lista().items.unwrap();
                 items.push(Item::default());
@@ -59,7 +59,7 @@ pub fn ListaView(id: u32) -> Element {
             MaterialIcon { name: "add_shopping_cart", size: 24 }
         }
         button {
-            class: "text-white bg-blue-700 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center",
+            class: "text-white bg-slate-800 hover:bg-slate-700 font-medium rounded-lg text-sm m-2 px-5 py-2.5 text-center transition-colors",
             onclick: move |_| {
                 _ = DATABASE.with(|f| f.clear_list_items(lista().id));
                 lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
@@ -92,7 +92,7 @@ fn ItemCard(item: Item) -> Element {
 
     rsx! {
         form {
-            class: "{bg_card_color} rounded-lg p-2 break-inside-avoid-column mb-2",
+            class: "{bg_card_color} rounded-lg p-3 break-inside-avoid-column mb-2 shadow-sm",
             onchange: {
                 move |event: Event<FormData>| {
                     handle_change(event);
@@ -105,7 +105,7 @@ fn ItemCard(item: Item) -> Element {
                 div { class: "flex",
                     input {
                         r#type: "number",
-                        class: "w-[5ch]",
+                        class: "w-[6ch] bg-transparent outline-none focus:ring-1 focus:ring-indigo-500 rounded px-1",
                         name: "cantidad_requerida",
                         value: "{item.cantidad_requerida:.3}",
                     }
@@ -126,7 +126,7 @@ fn ItemCard(item: Item) -> Element {
                 div { class: "flex",
                     input {
                         r#type: "number",
-                        class: "w-[4ch]",
+                        class: "w-[5ch] bg-transparent outline-none focus:ring-1 focus:ring-indigo-500 rounded px-1",
                         name: "precio",
                         value: "{item.precio:.2}",
                     }
@@ -134,7 +134,7 @@ fn ItemCard(item: Item) -> Element {
                 }
                 button {
                     r#type: "button",
-                    class: "text-red-600 rounded-full px-5 text-center",
+                    class: "text-slate-600 hover:text-red-600 rounded-full px-5 text-center transition-colors",
                     onclick: move |_| {
                         let _ = DATABASE.with(|f| f.delete_item(item.id));
                         lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));
@@ -146,7 +146,7 @@ fn ItemCard(item: Item) -> Element {
                 div {
                     input {
                         r#type: "text",
-                        class: "w-42",
+                        class: "w-42 bg-transparent outline-none focus:ring-1 focus:ring-indigo-500 rounded px-1",
                         name: "nombre",
                         value: item.nombre,
                     }
@@ -154,7 +154,7 @@ fn ItemCard(item: Item) -> Element {
                 div {
                     input {
                         r#type: "number",
-                        class: "w-[5ch]",
+                        class: "w-[6ch] bg-transparent outline-none focus:ring-1 focus:ring-indigo-500 rounded px-1",
                         name: "cantidad_comprada",
                         value: "{item.cantidad_comprada:.3}",
                     }
@@ -186,7 +186,7 @@ fn ItemCardSimple(item: Item) -> Element {
 
     rsx! {
         form {
-            class: "{bg_card_color} rounded-lg p-2 break-inside-avoid-column mb-2 flex text-lg font-bold justify-between",
+            class: "{bg_card_color} rounded-lg p-3 break-inside-avoid-column mb-2 flex text-lg font-bold justify-between shadow-sm",
             onchange: {
                 move |event: Event<FormData>| {
                     handle_change(event);
@@ -218,7 +218,7 @@ fn ItemCardSimple(item: Item) -> Element {
             }
             button {
                 r#type: "button",
-                class: "text-red-600 rounded-full px-5 text-center",
+                class: "text-slate-600 hover:text-red-600 rounded-full px-5 text-center transition-colors",
                 onclick: move |_| {
                     let _ = DATABASE.with(|f| f.delete_item(item.id));
                     lista.set(DATABASE.with(|f| f.get_list(lista().id).unwrap()));

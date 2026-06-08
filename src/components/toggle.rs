@@ -23,7 +23,7 @@ pub fn Toggle(props: ToggleProps) -> Element {
                 value: props.value,
                 onchange: props.onchange,
             }
-            span { class: "w-[6ch] h-[3ch] flex items-center shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-blue-800 after:w-[3ch] after:h-[3ch] after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-[2ch] group-hover:after:translate-x-[1ch]" }
+            span { class: "w-[6ch] h-[3ch] flex items-center shrink-0 ml-4 p-1 bg-slate-300 rounded-full duration-300 ease-in-out peer-checked:bg-slate-600 after:w-[3ch] after:h-[3ch] after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-[2ch] group-hover:after:translate-x-[1ch]" }
         }
     }
 }
