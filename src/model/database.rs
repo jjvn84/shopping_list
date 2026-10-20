@@ -74,28 +74,55 @@ impl SQLiteConnector {
 
     #[cfg(target_os = "android")]
     fn get_db_path() -> String {
-        use jni::JNIEnv;
         use jni::objects::{JObject, JString};
+        use jni::{EnvUnowned, Outcome};
         let (tx, rx) = std::sync::mpsc::channel();
 
-        fn run(env: &mut JNIEnv<'_>, activity: &JObject<'_>) -> anyhow::Result<PathBuf> {
+        fn run(env: &mut jni::Env<'_>, activity: &JObject<'_>) -> jni::errors::Result<PathBuf> {
             let files_dir = env
-                .call_method(activity, "getFilesDir", "()Ljava/io/File;", &[])?
+                .call_method(
+                    activity,
+                    jni::jni_str!("getFilesDir"),
+                    jni::jni_sig!("()Ljava/io/File;"),
+                    &[],
+                )?
                 .l()?;
-            let files_dir: JString<'_> = env
-                .call_method(files_dir, "getAbsolutePath", "()Ljava/lang/String;", &[])?
-                .l()?
-                .into();
-            let files_dir: String = env.get_string(&files_dir)?.into();
+            let files_dir = env
+                .call_method(
+                    files_dir,
+                    jni::jni_str!("getAbsolutePath"),
+                    jni::jni_sig!("()Ljava/lang/String;"),
+                    &[],
+                )?
+                .l()?;
+            let files_dir = env.cast_local::<JString>(files_dir)?;
+            let files_dir = files_dir.mutf8_chars(env)?.to_str().into_owned();
             Ok(PathBuf::from(files_dir))
         }
 
         dioxus::mobile::wry::prelude::dispatch(move |env, activity, _webview| {
-            tx.send(run(env, activity)).unwrap()
+            let raw_env = env.get_raw() as *mut jni::sys::JNIEnv;
+            let mut env = unsafe { EnvUnowned::from_raw(raw_env) };
+            let result = env
+                .with_env(|env| {
+                    let activity =
+                        unsafe { JObject::from_raw(env, activity.as_raw() as jni::sys::jobject) };
+                    run(env, &activity)
+                })
+                .into_outcome();
+            tx.send(match result {
+                Outcome::Ok(path) => Ok(path),
+                Outcome::Err(err) => Err(anyhow::Error::from(err)),
+                Outcome::Panic(payload) => std::panic::resume_unwind(payload),
+            })
+            .unwrap();
         });
 
-        let temp_path = rx.recv().unwrap().unwrap();
-        return String::from(temp_path.to_str().unwrap());
+        let temp_path = rx
+            .recv()
+            .expect("JNI dispatch channel closed")
+            .unwrap_or_else(|err| panic!("failed to get Android database path: {err:#}"));
+        String::from(temp_path.to_str().unwrap())
     }
 }
 impl DBConnector for SQLiteConnector {
