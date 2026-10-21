@@ -34,7 +34,10 @@
         platformVersions = [ "34" ];
         buildToolsVersions = [ "34.0.0" ];
 
-        includeEmulator = false;
+        includeEmulator = true;
+        includeSystemImages = true;
+        systemImageTypes = [ "google_apis" ];
+        abiVersions = [ "x86_64" ];
       };
 
       rustToolchain = pkgs.rust-bin.stable.latest.default.override {
